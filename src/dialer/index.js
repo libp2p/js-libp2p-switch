@@ -6,6 +6,11 @@ const { MAX_PARALLEL_DIALS, BLACK_LIST_TTL } = require('../constants')
 
 module.exports = function (_switch) {
   const dialQueueManager = new DialQueueManager(_switch)
+  const metrics = {
+    tried: 0,
+    success: 0,
+    fail: 0
+  }
 
   _switch.state.on('STOPPING:enter', abort)
 
@@ -19,10 +24,24 @@ module.exports = function (_switch) {
       protocol = null
     }
 
+    metrics.tried = metrics.tried + 1
+
     try {
       peerInfo = getPeerInfo(peerInfo, _switch._peerBook)
     } catch (err) {
+      metrics.fail = metrics.fail + 1
       return callback(err)
+    }
+
+    const cb = callback
+    callback = (err, res) => {
+      if (err) {
+        metrics.fail = metrics.fail + 1
+      } else {
+        metrics.success = metrics.success + 1
+      }
+
+      cb(err, res)
     }
 
     // Add it to the queue, it will automatically get executed

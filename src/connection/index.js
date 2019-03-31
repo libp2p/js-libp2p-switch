@@ -42,11 +42,14 @@ class ConnectionFSM extends BaseConnection {
    * @constructor
    */
   constructor ({ _switch, peerInfo, muxer, conn, type = 'out' }) {
+    const id = `${type}:${_switch._peerInfo.id.toB58String().slice(0, 8)}`
+
     super({
       _switch,
-      name: `${type}:${_switch._peerInfo.id.toB58String().slice(0, 8)}`
+      name: id
     })
 
+    this.id = Buffer.from(id)
     this.theirPeerInfo = peerInfo
     this.theirB58Id = this.theirPeerInfo.id.toB58String()
 
