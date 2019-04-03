@@ -11,6 +11,7 @@ module.exports = {
   NO_TRANSPORTS_REGISTERED: () => errCode('No transports registered, dial not possible', 'NO_TRANSPORTS_REGISTERED'),
   PROTECTOR_REQUIRED: () => errCode('No protector provided with private network enforced', 'PROTECTOR_REQUIRED'),
   UNEXPECTED_END: () => errCode('Unexpected end of input from reader.', 'UNEXPECTED_END'),
+  DIAL_QUEUE_MANAGER_STOPPED: () => errCode('Dial queue manager is stopped', 'DIALER_QUEUE_MANAGER_STOPPED'),
   maybeUnexpectedEnd: (err) => {
     if (err === true) {
       return module.exports.UNEXPECTED_END()

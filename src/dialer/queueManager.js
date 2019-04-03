@@ -2,7 +2,7 @@
 
 const once = require('once')
 const Queue = require('./queue')
-const { DIAL_ABORTED } = require('../errors')
+const { DIAL_ABORTED, DIAL_QUEUE_MANAGER_STOPPED } = require('../errors')
 const nextTick = require('async/nextTick')
 const retimer = require('retimer')
 const { QUARTER_HOUR } = require('../constants')
@@ -20,6 +20,11 @@ class DialQueueManager {
     this._queues = {}
     this.switch = _switch
     this._cleanInterval = retimer(this._clean.bind(this), QUARTER_HOUR)
+    this._isRunning = false
+  }
+
+  start () {
+    this._isRunning = true
   }
 
   /**
@@ -70,7 +75,9 @@ class DialQueueManager {
    *
    * This causes the entire DialerQueue to be drained
    */
-  abort () {
+  stop () {
+    this._isRunning = false
+
     // Clear the general queue
     this._queue.clear()
     // Clear the cold call queue
@@ -94,6 +101,10 @@ class DialQueueManager {
    */
   add ({ peerInfo, protocol, useFSM, callback }) {
     callback = callback ? once(callback) : noop
+
+    if (!this._isRunning) {
+      return callback(DIAL_QUEUE_MANAGER_STOPPED())
+    }
 
     // Add the dial to its respective queue
     const targetQueue = this.getQueue(peerInfo)
@@ -138,6 +149,10 @@ class DialQueueManager {
    * Will execute up to `MAX_PARALLEL_DIALS` dials
    */
   run () {
+    if (!this._isRunning) {
+      return
+    }
+
     if (this._dialingQueues.size < this.switch.dialer.MAX_PARALLEL_DIALS) {
       let nextQueue = { done: true }
       // Check the queue first and fall back to the cold call queue
