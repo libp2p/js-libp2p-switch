@@ -1,10 +1,9 @@
+/* eslint max-nested-callbacks: ["error", 5] */
 'use strict'
 
 const IdentifyService = require('libp2p-identify')
-const multistream = require('multistream-select')
 const debug = require('debug')
 const log = debug('libp2p:switch:conn-manager')
-const once = require('once')
 const ConnectionFSM = require('../connection')
 const { newStream } = require('../utils')
 

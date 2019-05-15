@@ -112,6 +112,7 @@ module.exports = function (_switch) {
    * @param {PeerInfo} peerInfo
    * @param {String} protocol The protocol to handshake for the new stream
    * @param {function(Error, Connection)} callback
+   * @returns {void}
    */
   function newStream (peerInfo, protocol, callback) {
     if (!protocol) {

@@ -1,6 +1,5 @@
 'use strict'
 
-const Identify = require('libp2p-identify')
 const Multistream = require('multistream-select')
 
 /**
